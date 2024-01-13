@@ -23,6 +23,30 @@ pub struct TomlData {
     pub windowsettings: WindowSettings
 }
 
+pub fn ensure_data_exists(path: &str) -> Result<(), String> {
+    let mut filepath = current_exe().unwrap();
+    filepath.pop();
+    filepath.push(path);
+
+    if fs::read(filepath).is_err() {
+        let data: TomlData = TomlData {
+            login: LoginData {
+                ip: "test-ip.com".to_string(),
+                user: "test-user".to_string(),
+                password: "test-password".to_string()
+            },
+            windowsettings: WindowSettings {
+                height: 1080,
+                width: 1920
+            }
+        };
+
+        return write_tomldata(path, &data);        
+    }
+
+    Ok(())
+}
+
 pub fn load_tomldata(path: &str) -> TomlData {
 
     let mut filepath = current_exe().unwrap();

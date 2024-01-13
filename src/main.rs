@@ -1,6 +1,6 @@
 mod libraries;
 
-use libraries::logger::log as log;
+use libraries::{logger::log as log, tomlstruct::ensure_data_exists};
 use libraries::tomlstruct;
 use libraries::tomlstruct::TomlData;
 
@@ -29,6 +29,10 @@ fn glow_context(window: &Window) -> imgui_glow_renderer::glow::Context {
 }
 
 fn main() {
+
+    if ensure_data_exists("data.toml").is_err() {
+        panic!("Somehow, we could not ensure that data.toml exists!");
+    }
 
     let mut data: TomlData = tomlstruct::load_tomldata("data.toml");
 
