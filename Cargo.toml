@@ -1,0 +1,13 @@
+[package]
+name = "understanding_rust"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+imgui = { path = "deps/imgui-rs/imgui", features = ["docking", "freetype"] }
+imgui-sdl2-support = { path = "./deps/imgui-rs/imgui-sdl2-support" }
+imgui-glow-renderer = { path = "./deps/imgui-rs/imgui-glow-renderer" }
+sdl2 = "0.35.2"
+colored = "2.1.0"
+toml = "0.8.8"
+serde = { version = "1.0.195", features = ["derive", "serde_derive"] }
