@@ -24,13 +24,9 @@ pub struct TomlData {
     pub windowsettings: WindowSettings
 }
 
-pub fn ensure_data_exists(path: &str) -> Result<(), String> {
-    let mut filepath = current_exe().unwrap();
-    filepath.pop();
-    filepath.push(path);
-
-    if fs::read(filepath).is_err() {
-        let data: TomlData = TomlData {
+impl Default for TomlData {
+    fn default() -> Self {
+        TomlData {
             firstlogin: true,
             login: LoginData {
                 ip: "test-ip.com".to_string(),
@@ -41,7 +37,17 @@ pub fn ensure_data_exists(path: &str) -> Result<(), String> {
                 height: 1080,
                 width: 1920
             }
-        };
+        }
+    }
+}
+
+pub fn ensure_data_exists(path: &str) -> Result<(), String> {
+    let mut filepath = current_exe().unwrap();
+    filepath.pop();
+    filepath.push(path);
+
+    if fs::read(filepath).is_err() {
+        let data: TomlData = TomlData {..Default::default()};
 
         return write_tomldata(path, &data);        
     }

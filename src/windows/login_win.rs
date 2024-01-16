@@ -51,47 +51,61 @@ async fn connect_to_sql(user:String, pass:String, server:String) -> Result<(), s
     Ok(())
 }
 
+fn login_win_pressed_ok(state: &mut ApplicationState) {
+    match block_on(connect_to_sql(
+        state.login_win_state.userbuf.clone(),
+        state.login_win_state.passbuf.clone(),
+        String::from_str("localhost").unwrap()
+    )) {
+        Ok(()) => {},
+        Err(err) => {
+            println!("Error in SQL-land:\n{}", err.to_string());
+        }
+    }
+    state.login_win_state.should_display = false;
+}
+
 pub fn login_win_do_display(ui: &imgui::Ui, state: &mut ApplicationState) {
-    let log_state = &mut state.login_win_state;
     let mut window_closed = false;
-    if log_state.should_display {
+    let mut ok_pressed: bool = false;
+    if state.login_win_state.should_display {
         ui.window("Login to Database")
             .size([500.0, 200.0], imgui::Condition::Always)
             .always_auto_resize(true)
             .flags(imgui::WindowFlags::NO_RESIZE)
             .build(|| {
                 ui.text_wrapped("Input your username and password. Reminder, they're specific to the database!");
-                ui.input_text("Username", &mut log_state.userbuf).build();
-                ui.input_text("Password", &mut log_state.passbuf).flags(
-                    imgui::InputTextFlags::PASSWORD
-                ).build();
+                if ui.input_text("Username", &mut state.login_win_state.userbuf)
+                .flags(imgui::InputTextFlags::ENTER_RETURNS_TRUE)
+                .build() {
+                    ok_pressed = true;
+                }
+                if ui.input_text("Password", &mut state.login_win_state.passbuf).flags(
+                    imgui::InputTextFlags::PASSWORD |
+                    imgui::InputTextFlags::ENTER_RETURNS_TRUE
+                ).build() {
+                    ok_pressed = true;
+                }
 
                 if ui.button("Cancel") {
                     window_closed = true;
-                    log_state.should_display = false;
+                    state.login_win_state.should_display = false;
                 }
                 
                 ui.same_line();
 
                 if ui.button("OK") {
-                    match block_on(connect_to_sql(
-                        log_state.userbuf.clone(),
-                        log_state.passbuf.clone(),
-                        String::from_str("localhost").unwrap()
-                    )) {
-                        Ok(()) => {},
-                        Err(err) => {
-                            println!("Error in SQL-land:\n{}", err.to_string());
-                        }
-                    }
-                    window_closed = true;
-                    log_state.should_display = false;
+                    ok_pressed = true;
                 }
 
             });
+        if ok_pressed {
+            login_win_pressed_ok(state);
+            window_closed = true;
+        }
         if window_closed {
-            log_state.userbuf.clear();
-            log_state.passbuf.clear();
+            state.login_win_state.userbuf.clear();
+            state.login_win_state.passbuf.clear();
         }
     }
 

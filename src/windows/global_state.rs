@@ -1,3 +1,5 @@
+use super::tomlstruct::*;
+
 pub struct LoginWinState {
     pub should_display: bool,
     pub userbuf: String,
@@ -33,6 +35,7 @@ impl Default for SetServerWinState {
 /* GLOBAL APPLICATION STATE */
 
 pub struct ApplicationState {
+    pub tomldata: TomlData,
     pub set_server_win_state: SetServerWinState,
     pub login_win_state: LoginWinState
 }
@@ -40,6 +43,7 @@ pub struct ApplicationState {
 impl Default for ApplicationState {
     fn default() -> Self {
         ApplicationState {
+            tomldata: TomlData {..Default::default()},
             set_server_win_state: SetServerWinState {..Default::default()},
             login_win_state: LoginWinState {..Default::default()}
         }

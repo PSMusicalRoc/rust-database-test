@@ -1,12 +1,11 @@
 mod libraries;
 mod windows;
 
-use libraries::{logger::log as log, tomlstruct::ensure_data_exists};
-use libraries::tomlstruct;
-use libraries::tomlstruct::TomlData;
+use libraries::logger::log;
 
 use windows::{
     *,
+    tomlstruct::*,
     global_state::*
 };
 
