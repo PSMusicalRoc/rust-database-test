@@ -19,6 +19,7 @@ pub struct WindowSettings {
 
 #[derive(Deserialize, Serialize)]
 pub struct TomlData {
+    pub firstlogin: bool,
     pub login: LoginData,
     pub windowsettings: WindowSettings
 }
@@ -30,6 +31,7 @@ pub fn ensure_data_exists(path: &str) -> Result<(), String> {
 
     if fs::read(filepath).is_err() {
         let data: TomlData = TomlData {
+            firstlogin: true,
             login: LoginData {
                 ip: "test-ip.com".to_string(),
                 user: "test-user".to_string(),

@@ -1,8 +1,14 @@
 mod libraries;
+mod windows;
 
 use libraries::{logger::log as log, tomlstruct::ensure_data_exists};
 use libraries::tomlstruct;
 use libraries::tomlstruct::TomlData;
+
+use windows::{
+    *,
+    global_state::*
+};
 
 use sdl2::{
     video::*,
@@ -29,12 +35,12 @@ fn glow_context(window: &Window) -> imgui_glow_renderer::glow::Context {
 }
 
 fn main() {
-
     if ensure_data_exists("data.toml").is_err() {
         panic!("Somehow, we could not ensure that data.toml exists!");
     }
 
     let mut data: TomlData = tomlstruct::load_tomldata("data.toml");
+    let mut state: ApplicationState = ApplicationState {..Default::default()}; 
 
     log::info("Welcome to Roc's Oxidized Test!");
 
@@ -167,6 +173,16 @@ fn main() {
         let ui = imgui.new_frame();
 
         ui.main_menu_bar(|| {
+
+            ui.menu("Debug - Windows", || {
+                if ui.menu_item("Change Server Window") {
+                    state.set_server_win_state.should_display = true;
+                }
+                if ui.menu_item("Login Window") {
+                    state.login_win_state.should_display = true;
+                }
+            });
+
             menubar_height = ui.window_size()[1];
         });
 
@@ -187,6 +203,9 @@ fn main() {
             .bg_alpha(0.2)
             .build(|| {
             });
+
+        set_server_win::set_server_win_do_display(&ui, &mut state.set_server_win_state);
+        login_win::login_win_do_display(&ui, &mut state);
 
         let draw_data = imgui.render();
 
